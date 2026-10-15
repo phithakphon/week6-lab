@@ -5,7 +5,7 @@ import (
     "log"
     "net/http"
     "strconv"
-	
+	"errors"
     "moviehub/auth"
     "moviehub/store"
 )
@@ -61,3 +61,10 @@ func (h *Handler) ListReviews(w http.ResponseWriter, r *http.Request) {
     }
     writeJSON(w, http.StatusOK, map[string]any{"items": items})
 }
+curl -s -i -X OPTIONS localhost:8080/api/movies \
+  -H 'Origin: http://localhost:3000' \
+  -H 'Access-Control-Request-Method: GET'
+
+curl -s -i -X OPTIONS localhost:8080/api/movies \
+  -H 'Origin: http://localhost:3001' \
+  -H 'Access-Control-Request-Method: GET'

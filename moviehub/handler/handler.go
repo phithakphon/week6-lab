@@ -61,10 +61,20 @@ func (h *Handler) ListReviews(w http.ResponseWriter, r *http.Request) {
     }
     writeJSON(w, http.StatusOK, map[string]any{"items": items})
 }
-curl -s -i -X OPTIONS localhost:8080/api/movies \
-  -H 'Origin: http://localhost:3000' \
-  -H 'Access-Control-Request-Method: GET'
-
-curl -s -i -X OPTIONS localhost:8080/api/movies \
-  -H 'Origin: http://localhost:3001' \
-  -H 'Access-Control-Request-Method: GET'
+func (h *Handler) GetMovie(w http.ResponseWriter, r *http.Request) {
+    id, ok := pathID(r, "id")
+    if !ok {
+        writeError(w, http.StatusBadRequest, "BAD_ID", "เลขหนังต้องเป็นตัวเลข")
+        return
+    }
+    m, err := h.Store.GetMovie(r.Context(), id)
+    if errors.Is(err, store.ErrNotFound) {
+        writeError(w, http.StatusNotFound, "MOVIE_NOT_FOUND", "ไม่พบหนังเรื่องนี้")
+        return
+    }
+    if err != nil {
+        internal(w, err)
+        return
+    }
+    writeJSON(w, http.StatusOK, m)
+}
